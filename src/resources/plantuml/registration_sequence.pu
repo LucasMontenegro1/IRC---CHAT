@@ -1,0 +1,21 @@
+@startuml
+title MainServer User Registration Thread
+participant MainServer as MS
+participant "impl Runnable trait" as UH
+actor NewClient as client 
+
+
+activate MS #A4DCEB
+client -> MS : accept(): client
+group handle_incoming_connection(client)
+	MS -> UH **: build()
+	MS -> MS ++ #CEECF5: registration() 
+	group registration process | NICK/USER/PASS || SERVER
+		MS -> UH : registration(message)
+		MS <- UH : impl Runnable 
+	end
+	MS -> UH ++ #CEECF5: run(client)
+end
+	client -> UH: <b>[Sends IRC || DCC commands]</b>
+
+@enduml

@@ -1,0 +1,23 @@
+[package]
+name = "irc_project"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+[[bin]]
+name = "server"
+path = "src/bin/server.rs"
+
+[[bin]]
+name = "client"
+path = "src/bin/client.rs"
+
+[[bin]]
+name = "client-view"
+path = "src/bin/client_view.rs"
+
+[dependencies]
+gtk4 = "0.5.0"
+sha = "1.0.3"
+zip = "0.6.6"
+rust-crypto = "0.2.36"

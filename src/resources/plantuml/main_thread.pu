@@ -1,0 +1,45 @@
+@startuml
+title MainServer - Server Message Reception Thread
+participant "MainServer: servernameA" as MS
+participant ServerCommunicationHandler as SCH
+participant "Server: servernameB" as MS2
+actor "Server Operator" as clientop
+actor "Server Client" as client 
+participant "impl Runnable trait" as UH
+skinparam lifelineStrategy solid
+
+
+MS -> SCH **: build_server_comunication() 
+MS -> SCH ++ #CEECF5: run_cli() 
+activate MS #A4DCEB
+loop handle_cli_communication(client)
+	clientop --> MS : message :  <b><ip> SERVER</b>
+	SCH -> SCH : build_server_msg(message)
+	SCH -> SCH: send_handshake(ip)
+	SCH --> MS2: <b>SERVER servernameA 1</b>
+	SCH -> SCH ++ #e6f5fa: wait_for_handshake_response() 
+end
+deactivate MS #A4DCEB
+SCH <-- MS2: <b>SERVER servernameB 1</b>
+SCH -> SCH: handle_handshake process 
+SCH -> SCH #e6f5fa: run(client)
+MS2 --> SCH: <b>[Sends IRC || DCC commands]</b>
+
+
+activate MS #A4DCEB
+loop Listener::accept(client)
+	client -> MS : accept(): client
+	group handle_incoming_connection(client)
+		MS -> UH **: build()
+		MS -> MS ++ #CEECF5: registration() 
+		group registration process | NICK/USER/PASS || SERVER
+			MS -> UH : registration(message)
+			MS <- UH : impl Runnable 
+		end
+		MS -> UH ++ #CEECF5: run(client)
+	end
+end
+client -> UH: <b>[Sends IRC || DCC commands]</b>
+deactivate MS #A4DCEB
+
+@enduml

@@ -1,0 +1,30 @@
+@startuml
+title MainServer Server Registration Thread
+participant "MainServer: servernameA" as MS
+participant ServerCommunicationHandler as SCH
+participant "NewServer: servernameB" as MS2
+
+
+activate MS #A4DCEB
+MS2 -> MS : accept(): client
+group handle_incoming_connection(client)
+	MS -> SCH **: build_server_comunication()
+	MS -> MS ++ #CEECF5: registration() 
+		group registration process | message SERVER
+		MS <-- MS2: <b>SERVER servernameB 1</b>
+		MS -> SCH ++ #CEECF5: register_server() 
+		SCH -> SCH : send_handshake(message)
+		SCH --> MS2: <b>SERVER servernameA 1</b>
+		group handle_handshake process 
+			SCH -> SCH : inform_neighbours_new_server(message)
+			SCH -> SCH : add_server_into_network(message)
+			SCH -> SCH ++--: send_server_information(message)
+			MS <- SCH --: ServerCommunicationHandler(impl Runnable trait)
+		end
+	end
+	MS -> SCH ++ #CEECF5: run(client)
+end
+	MS2 -> SCH: <b>[Sends IRC || DCC commands]</b>
+
+
+@enduml

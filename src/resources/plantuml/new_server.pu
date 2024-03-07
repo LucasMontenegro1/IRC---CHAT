@@ -1,0 +1,30 @@
+@startuml
+title MainServer - Server Message Reception Thread
+participant "MainServer: servernameA" as MS
+participant ServerCommunicationHandler as SCH
+participant "Server: servernameB" as MS2
+actor "Server Operator" as client 
+
+
+activate MS #A4DCEB
+MS -> SCH **: build_server_comunication() 
+MS -> SCH ++ #CEECF5: run_cli() 
+loop handle_cli_communication(client)
+	client --> MS : message :  <b><ip> SERVER</b>
+	SCH -> SCH : build_server_msg(message)
+	SCH -> SCH: send_handshake(ip)
+	SCH --> MS2: <b>SERVER servernameA 1</b>
+	SCH -> SCH ++ #e6f5fa: wait_for_handshake_response() 
+end
+	SCH <-- MS2: <b>SERVER servernameB 1</b>
+	group handle_handshake process 
+		SCH -> SCH : inform_neighbours_new_server(message)
+		SCH -> SCH : add_server_into_network(message)
+		SCH -> SCH ++--: send_server_information(message)
+		SCH --> SCH : self
+	end
+	SCH -> SCH #e6f5fa: run(client)
+	MS2 --> SCH: <b>[Sends IRC || DCC commands]</b>
+
+
+@enduml
